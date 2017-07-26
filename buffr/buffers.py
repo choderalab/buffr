@@ -14,13 +14,23 @@ class Buffer:
         Parameters
         ----------
         pka - the acid constant of the buffer in inverse log units
-        acid - Chemical, the acidic component of the buffer
-        base - Chemical, the basic component of the buffer
+        acid - DryChemical, the acidic component of the buffer
+        base - DryChemical, the basic component of the buffer
         """
 
         self.pka = pka
         self.acid = acid
         self.base = base
+        self.extra_dry_components = list()
+
+    def add_extra_dry_component(self, component: DryChemical, concentration: u.Quantity):
+        """
+        Add an extra (dry chemical) component to the buffer at a specific concentration.
+        component - DryChemical
+        concentration - The desired concentration of the component. Quantity
+        """
+        self.extra_dry_components.append((component, concentration))
+        return
 
     def recipe_at_ph(self, ph: float, concentration: u.Quantity, volume: u.Quantity = u.Quantity(1.0, 'liter')):
         """
@@ -52,9 +62,18 @@ class Buffer:
         base_weight = base_moles * self.base.mw * (100.0/self.base.purity)
         acid_weight = acid_moles * self.acid.mw * (100.0/self.acid.purity)
 
-        return ("pH {0:.2f}:\n{1}: {3:.3f};\n{2}: {4:.3f}\nper {5:.3f} \n ".format(ph, self.base.name, self.acid.name, base_weight.to('grams'),
-                                                                   acid_weight.to('grams'), volume.to('liter')))
+        recipe = "pH {0:.2f}:\n{1}: {3:.3f};\n{2}: {4:.3f}\nper {5:.3f} \n ".format(ph, self.base.name,
+                                                                                       self.acid.name,
+                                                                                       base_weight.to('grams'),
+                                                                                       acid_weight.to('grams'),
+                                                                                       volume.to('liter'))
+        if len(self.extra_dry_components):
+            recipe += "Also add:\n"
+        for component, component_concentration in self.extra_dry_components:
+            recipe += "{0}: {1:.3f}\n".format(component.name, (component_concentration * volume * component.mw).to('grams'))
+
+        return recipe
 
 
 Tris_buffer = Buffer(8.06, chemicals.Trizma_hydrochloride, chemicals.TRIS_base)
-Sodium_Phosphate_buffer = Buffer(7.2, chemicals.Sodium_Phosphate_Monobasic_Dihydrate, chemicals.Sodium_Phosphate_Monobasic_Dihydrate)
+Sodium_Phosphate_buffer = Buffer(7.2, chemicals.Sodium_Phosphate_Monobasic_Dihydrate, chemicals.Sodium_Phosphate_Dibasic)
