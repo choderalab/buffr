@@ -1,5 +1,6 @@
 import buffr
 import numpy as np
+from copy import deepcopy
 
 Kinase_Binding_Assay_Buffer = buffr.Tris_buffer
 
@@ -12,7 +13,7 @@ for pH in np.linspace(7.0, 9.0, 21):
     print(Kinase_Binding_Assay_Buffer.recipe_at_ph(pH, concentration, volume))
 
 # Carbonic anhydrase II ITC buffer
-CAII_ITC_Buffer = buffr.Sodium_Phosphate_buffer
+CAII_ITC_Buffer = deepcopy(buffr.Sodium_Phosphate_buffer)
 CAII_ITC_Buffer.add_extra_dry_component(buffr.chemicals.Sodium_Chloride, buffr.u.Quantity(150, 'millimole/liter'))
 
 volume = buffr.u.Quantity(1, 'liter')
