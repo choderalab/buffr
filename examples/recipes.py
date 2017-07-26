@@ -14,7 +14,7 @@ for pH in np.linspace(7.0, 9.0, 21):
 
 print("CAII buffer acid/base component recipe for pH")
 for pH in np.linspace(6.2, 8.2, 21):
-    print(CB7_Host_Guest_Buffer.recipe_at_ph(pH, concentration, volume))
+    print(CAII_ITC_Buffer.recipe_at_ph(pH, concentration, volume))
 
 volume = buffr.u.Quantity(1, 'liter')
 concentration = buffr.u.Quantity(100, 'millimole/liter')
